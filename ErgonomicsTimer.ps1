@@ -47,32 +47,6 @@ function Write-Config($config) {
     } catch { }
 }
 
-function New-TrayIcon {
-    $bmp = New-Object System.Drawing.Bitmap 32, 32
-    $g = [System.Drawing.Graphics]::FromImage($bmp)
-    $g.SmoothingMode = 'AntiAlias'
-    $g.Clear([System.Drawing.Color]::Transparent)
-
-    $disc = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(58, 116, 138))
-    $g.FillEllipse($disc, 0, 0, 31, 31)
-
-    $ink = New-Object System.Drawing.Pen ([System.Drawing.Color]::White), 2.6
-    $ink.StartCap = 'Round'
-    $ink.EndCap = 'Round'
-    $white = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::White)
-
-    $g.FillEllipse($white, 13, 5, 7, 7)
-    $g.DrawLine($ink, 16, 13, 16, 21)
-    $g.DrawLine($ink, 8, 9, 16, 15)
-    $g.DrawLine($ink, 24, 9, 16, 15)
-    $g.DrawLine($ink, 16, 21, 11, 27)
-    $g.DrawLine($ink, 16, 21, 21, 27)
-
-    $icon = [System.Drawing.Icon]::FromHandle($bmp.GetHicon())
-    $disc.Dispose(); $ink.Dispose(); $white.Dispose(); $g.Dispose(); $bmp.Dispose()
-    $icon
-}
-
 $config = Read-Config
 
 if ($TestAlert) {
@@ -119,7 +93,7 @@ function Get-NextSlot {
     Get-SlotTimes | Where-Object { $_ -gt $now } | Sort-Object | Select-Object -First 1
 }
 
-$icon = New-TrayIcon
+$icon = New-StretchIcon
 
 $menu = New-Object System.Windows.Forms.ContextMenuStrip
 
@@ -240,9 +214,24 @@ $exitItem.Add_Click({
     [System.Windows.Forms.Application]::Exit()
 })
 
-$notify.Add_MouseDoubleClick({
-    Invoke-Alert
+function Show-TrayMenu {
     Update-Tooltip
+    try {
+        $method = $notify.GetType().GetMethod('ShowContextMenu',
+            [System.Reflection.BindingFlags]'NonPublic, Instance')
+        if ($method) {
+            $method.Invoke($notify, $null)
+        } else {
+            $menu.Show([System.Windows.Forms.Cursor]::Position)
+        }
+    } catch {
+        Write-Log "menu error: $($_.Exception.Message)"
+        $menu.Show([System.Windows.Forms.Cursor]::Position)
+    }
+}
+
+$notify.Add_MouseClick({
+    if ($_.Button -eq [System.Windows.Forms.MouseButtons]::Left) { Show-TrayMenu }
 })
 
 Update-Tooltip

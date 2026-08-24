@@ -41,12 +41,12 @@ and prompt on the `.vbs` launcher.
 
 ## Tray menu
 
-Right-click the tray icon:
+Click the tray icon — either button opens the menu:
 
 | Item | Behaviour |
 | --- | --- |
 | `Next: 3:50 PM` | Next scheduled alert, or snooze/pause status. Not clickable. |
-| **Stretch now** | Starts a stretch break immediately. Double-clicking the icon does the same. |
+| **Stretch now** | Starts a stretch break immediately. |
 | **Sound** | Toggles the chime. Off by default; the change is saved to `config.json`. |
 | **Pause for today** | Suppresses remaining alerts until tomorrow. |
 | **Open folder** | Opens this directory in Explorer. |
@@ -75,7 +75,7 @@ until logoff.
 | File | Role |
 | --- | --- |
 | `ErgonomicsTimer.ps1` | Tray icon, menu, and the scheduler loop. The resident process. |
-| `Alert.ps1` | `Show-StretchAlert` — the countdown window. |
+| `Alert.ps1` | `Show-StretchAlert` — the countdown window — and `New-StretchIcon`, the icon used by both the tray and the window. |
 | `run-hidden.vbs` | Launches the app with no console window. |
 | `Install.cmd` / `Uninstall.cmd` | Double-click entry points. Bypass the execution policy, then call the `.ps1`. |
 | `Install.ps1` / `Uninstall.ps1` | Scheduled task registration. |

@@ -1,6 +1,32 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
+function New-StretchIcon {
+    $bmp = New-Object System.Drawing.Bitmap 32, 32
+    $g = [System.Drawing.Graphics]::FromImage($bmp)
+    $g.SmoothingMode = 'AntiAlias'
+    $g.Clear([System.Drawing.Color]::Transparent)
+
+    $disc = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(58, 116, 138))
+    $g.FillEllipse($disc, 0, 0, 31, 31)
+
+    $ink = New-Object System.Drawing.Pen ([System.Drawing.Color]::White), 2.6
+    $ink.StartCap = 'Round'
+    $ink.EndCap = 'Round'
+    $white = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::White)
+
+    $g.FillEllipse($white, 13, 5, 7, 7)
+    $g.DrawLine($ink, 16, 13, 16, 21)
+    $g.DrawLine($ink, 8, 9, 16, 15)
+    $g.DrawLine($ink, 24, 9, 16, 15)
+    $g.DrawLine($ink, 16, 21, 11, 27)
+    $g.DrawLine($ink, 16, 21, 21, 27)
+
+    $icon = [System.Drawing.Icon]::FromHandle($bmp.GetHicon())
+    $disc.Dispose(); $ink.Dispose(); $white.Dispose(); $g.Dispose(); $bmp.Dispose()
+    $icon
+}
+
 function Play-StretchChime {
     $wav = Join-Path $env:SystemRoot 'Media\Alarm01.wav'
     if (-not (Test-Path $wav)) { $wav = Join-Path $env:SystemRoot 'Media\notify.wav' }
@@ -35,6 +61,9 @@ function Show-StretchAlert {
     $form.MinimizeBox = $false
     $form.TopMost = $true
     $form.BackColor = [System.Drawing.Color]::FromArgb(24, 28, 36)
+    $form.ShowInTaskbar = $true
+    $formIcon = New-StretchIcon
+    $form.Icon = $formIcon
 
     $heading = New-Object System.Windows.Forms.Label
     $heading.Text = 'Stand up and stretch'
@@ -123,6 +152,7 @@ function Show-StretchAlert {
     $timer.Stop()
     $timer.Dispose()
     $form.Dispose()
+    $formIcon.Dispose()
 
     $state.Result
 }
