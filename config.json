@@ -1,0 +1,7 @@
+{
+  "times": ["09:50", "10:50", "11:50", "12:50", "13:50", "14:50", "15:50", "16:50"],
+  "stretchMinutes": 10,
+  "snoozeMinutes": 5,
+  "sound": false,
+  "weekdaysOnly": true
+}
