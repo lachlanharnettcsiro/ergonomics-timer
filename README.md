@@ -13,15 +13,31 @@ Windows with PowerShell 5.1 (built in). No modules or downloads.
 
 ## Install
 
-```powershell
-.\Install.ps1
-```
+Download or clone the folder anywhere you like, then **double-click `Install.cmd`**.
 
-This registers a scheduled task named `ErgonomicsTimer` that starts the app at logon
+That registers a scheduled task named `ErgonomicsTimer` which starts the app at logon
 (30 second delay), and starts it immediately so the tray icon appears right away. No
 administrator rights are needed — the task runs as the current user.
 
-Use `-NoStart` to register the task without launching now.
+Prefer a terminal? Use the wrapper there too:
+
+```
+Install.cmd -NoStart
+```
+
+`-NoStart` registers the task without launching now.
+
+You can call `Install.ps1` directly, but only with an execution-policy override —
+Windows refuses unsigned scripts out of the box (`Restricted` by default), which is
+exactly what the `.cmd` wrapper handles:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Install.ps1
+```
+
+The wrapper also runs `Unblock-File` over the folder, clearing the
+"downloaded from the internet" mark that would otherwise make Windows block the scripts
+and prompt on the `.vbs` launcher.
 
 ## Tray menu
 
@@ -51,11 +67,7 @@ Edit `config.json`, then restart the app (Exit from the tray menu, then run
 
 ## Uninstall
 
-```powershell
-.\Uninstall.ps1
-```
-
-Removes the scheduled task. Exit the running instance from the tray menu, or it stays
+Double-click `Uninstall.cmd`. Removes the scheduled task. Exit the running instance from the tray menu, or it stays
 until logoff.
 
 ## Files
@@ -65,6 +77,7 @@ until logoff.
 | `ErgonomicsTimer.ps1` | Tray icon, menu, and the scheduler loop. The resident process. |
 | `Alert.ps1` | `Show-StretchAlert` — the countdown window. |
 | `run-hidden.vbs` | Launches the app with no console window. |
+| `Install.cmd` / `Uninstall.cmd` | Double-click entry points. Bypass the execution policy, then call the `.ps1`. |
 | `Install.ps1` / `Uninstall.ps1` | Scheduled task registration. |
 | `config.json` | Settings, above. |
 

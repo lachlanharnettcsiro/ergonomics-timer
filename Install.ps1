@@ -10,6 +10,8 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $launcher = Join-Path $root 'run-hidden.vbs'
 if (-not (Test-Path $launcher)) { throw "Launcher not found: $launcher" }
 
+Get-ChildItem -Path $root -File | Unblock-File -ErrorAction SilentlyContinue
+
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME"
 $trigger.Delay = 'PT30S'
 
